@@ -4,7 +4,7 @@ import random
 import pygame
 import neat
 
-WIN_WIDTH = 600
+WIN_WIDTH = 500
 WIN_HEIGHT = 800
 
 
@@ -16,14 +16,15 @@ def load_image(img_name):
     pygame.transform.scale2x(pygame.image.load(get_img_path(img_name)))
 
 
-birds_imgs = ["bird1", "bird2", "bird3"]
-base_img_name = "base"
-bg_img_name = "bg"
-pipe_img_name = "pipe"
+birds_imgs = ["bird1.png", "bird2.png", "bird3.png"]
+base_img_name = "base.png"
+bg_img_name = "bg.png"
+pipe_img_name = "pipe.png"
 
-BIRD_IMGS = map(load_image, birds_imgs)
+BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(get_img_path(img))) for img in birds_imgs]
 BASE_IMG = load_image(base_img_name)
-BG_IMG = load_image(bg_img_name)
+BG_IMG = pygame.transform.scale2x(pygame.image.load(get_img_path(bg_img_name)))
+# BG_IMG = pygame.transform.scale(pygame.image.load(os.path.join("imgs","bg.png")))
 PIPE_IMG = load_image(pipe_img_name)
 
 
@@ -92,3 +93,28 @@ class Bird:
 
     def get_mask(self):
         return pygame.mask.from_surface(self.img)
+
+
+def draw_window(win, bird):
+    win.blit(BG_IMG, (0,0))
+    bird.draw(win)
+    pygame.display.update()
+
+def main():
+    bird = Bird(200, 200)
+    win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
+    run = True
+    clock = pygame.time.Clock()
+    while run:
+        clock.tick(30)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        bird.move()
+        draw_window(win=win, bird=bird)
+
+    pygame.quit()
+    quit()
+
+
+main()
