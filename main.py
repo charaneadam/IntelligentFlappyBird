@@ -4,6 +4,8 @@ import random
 import pygame
 import neat
 
+pygame.font.init()
+
 WIN_WIDTH = 500
 WIN_HEIGHT = 800
 
@@ -12,21 +14,17 @@ def get_img_path(img_name):
     return os.path.join("imgs", img_name)
 
 
-def load_image(img_name):
-    pygame.transform.scale2x(pygame.image.load(get_img_path(img_name)))
-
-
 birds_imgs = ["bird1.png", "bird2.png", "bird3.png"]
 base_img_name = "base.png"
 bg_img_name = "bg.png"
 pipe_img_name = "pipe.png"
 
 BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(get_img_path(img))) for img in birds_imgs]
-BASE_IMG = load_image(base_img_name)
+BASE_IMG = pygame.transform.scale2x(pygame.image.load(get_img_path(base_img_name)))
 BG_IMG = pygame.transform.scale2x(pygame.image.load(get_img_path(bg_img_name)))
-# BG_IMG = pygame.transform.scale(pygame.image.load(os.path.join("imgs","bg.png")))
-PIPE_IMG = load_image(pipe_img_name)
+PIPE_IMG = pygame.transform.scale2x(pygame.image.load(get_img_path(pipe_img_name)))
 
+STAT_FONT = pygame.font.SysFont('comicsans', 50)
 
 class Bird:
     IMGS = BIRD_IMGS
@@ -159,24 +157,60 @@ class Base:
         win.blit(self.IMG, (self.x2, self.y))
 
 
-def draw_window(win, bird):
+def draw_window(win, bird, pipes, base, score):
     win.blit(BG_IMG, (0, 0))
+
+    for pipe in pipes:
+        pipe.draw(win)
+
+    text = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
+    win.blit(text, (WIN_WIDTH - 10 - text.get_width(), 10))
+
+    base.draw(win)
     bird.draw(win)
     pygame.display.update()
 
 
 def main():
-    bird = Bird(200, 200)
+    bird = Bird(230, 350)
+    base = Base(730)
+    pipes = {Pipe(700)}
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     run = True
     clock = pygame.time.Clock()
+    score = 0
     while run:
         clock.tick(30)
+        add_pipe = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        bird.move()
-        draw_window(win=win, bird=bird)
+        # bird.move()
+        rem = list()
+        for pipe in pipes:
+            if pipe.collide(bird):
+                pass
+            if pipe.x + pipe.PIPE_TOP.get_width() < 0:
+                rem.append(pipe)
+
+            if not pipe.passed and pipe.x < bird.x:
+                pipe.passed = True
+                add_pipe = True
+            pipe.move()
+
+        if add_pipe:
+            score += 1
+            pipes.add(Pipe(700))
+
+        for r in rem:
+            pipes.remove(r)
+
+        if bird.y + bird.img.get_width() >= 730:
+            # hitted the ground
+            pass
+
+        base.move()
+        draw_window(win=win, bird=bird, pipes=pipes, base=base, score=score)
 
     pygame.quit()
     quit()
