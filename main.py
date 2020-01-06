@@ -4,26 +4,33 @@ import random
 import pygame
 import neat
 
+# initialization
 pygame.font.init()
 
-WIN_WIDTH = 500
-WIN_HEIGHT = 800
-
-
+# helper functions
 def get_img_path(img_name):
     return os.path.join("imgs", img_name)
 
+def load_img(img):
+    return pygame.transform.scale2x(pygame.image.load(get_img_path(img)))
 
+# graphics parameters
+WIN_WIDTH = 500
+WIN_HEIGHT = 800
+
+# images (raw_names)
 birds_imgs = ["bird1.png", "bird2.png", "bird3.png"]
 base_img_name = "base.png"
 bg_img_name = "bg.png"
 pipe_img_name = "pipe.png"
 
-BIRD_IMGS = [pygame.transform.scale2x(pygame.image.load(get_img_path(img))) for img in birds_imgs]
-BASE_IMG = pygame.transform.scale2x(pygame.image.load(get_img_path(base_img_name)))
-BG_IMG = pygame.transform.scale2x(pygame.image.load(get_img_path(bg_img_name)))
-PIPE_IMG = pygame.transform.scale2x(pygame.image.load(get_img_path(pipe_img_name)))
+# images
+BIRD_IMGS = [load_img(img) for img in birds_imgs]
+BASE_IMG = load_img(base_img_name)
+BG_IMG = load_img(bg_img_name)
+PIPE_IMG = load_img(pipe_img_name)
 
+# font
 STAT_FONT = pygame.font.SysFont('comicsans', 50)
 
 class Bird:
@@ -180,7 +187,7 @@ def main():
     clock = pygame.time.Clock()
     score = 0
     while run:
-        clock.tick(30)
+        clock.tick(40)
         add_pipe = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -200,7 +207,7 @@ def main():
 
         if add_pipe:
             score += 1
-            pipes.add(Pipe(700))
+            pipes.add(Pipe(600))
 
         for r in rem:
             pipes.remove(r)
